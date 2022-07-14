@@ -5,7 +5,8 @@ var qs=require('querystring');
 const { Redirect } = require('request/lib/redirect');
 var template=require('./lib/template.js');
 var path=require('path');
- 
+var sanitizeHtml= require('sanitize-html');
+
 var app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;   // query: {id:'CSS'}
@@ -26,7 +27,9 @@ var app = http.createServer(function(request,response){
         fs.readdir('./data',function(error, filelist){ // 파일 리스트 얻기
           fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
             var title = queryData.id;
-            var html = template.html3(title,description);
+            var sanitizeTitle=sanitizeHtml(title);
+            var sanitizeDescription=sanitizeHtml(description);
+            var html = template.html3(sanitizeTitle,sanitizeDescription);
             response.writeHead(200);
             response.end(html);
           });
@@ -75,26 +78,27 @@ var app = http.createServer(function(request,response){
     else if(pathname === '/update'){
       console.log("업데이트");
       fs.readdir('./data',function(error, filelist){ // 파일 리스트 얻기
-        var filteredId=path.parse(queryData.id).base;
-        console.log(filteredId);
+        var filteredId=path.parse(queryData.id).base; // .. 생략하고 뒷부분 얻음
+        //console.log(filteredId);
         fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
           var title = queryData.id;
-          
-          var html = template.html_write(title,
+          var sanitizeTitle=sanitizeHtml(title);
+          var sanitizeDescription=sanitizeHtml(description);
+          var html = template.html_write(sanitizeTitle,
             `
             <form action="/update_process" method="post">
-            <input type="hidden" name="id" value="${title}"> 
+            <input type="hidden" name="id" value="${sanitizeTitle}"> 
                <p>
-                  <input type="text" name="title" placeholder="title" value=${title}></input>
+                  <input type="text" name="title" placeholder="title" value=${sanitizeTitle}></input>
                </p>
                <p>
-                  <textarea name="description" placeholder="description">${description}</textarea>
+                  <textarea name="description" placeholder="description">${sanitizeDescription}</textarea>
                </p>
                <p>
                 <input type="submit">
                </p>
              </form>
-             <a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+             <a href="/create">create</a> <a href="/update?id=${sanitizeTitle}">update</a>`
             );
           response.writeHead(200);
           response.end(html);
