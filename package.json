@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/meeny-miny-moe/nodejs_blog#readme",
   "dependencies": {
+    "express": "^4.18.2",
     "sanitize-html": "^2.7.0"
   }
 }

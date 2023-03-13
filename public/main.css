@@ -111,7 +111,7 @@
   top: 0;
   width: 100%;
   height: 100%;
-  border-right: solid 5px #df4500;
+  border-right: solid 5px lightcoral;
   background: #3c3735;
   transition: 0.35s ease left;
 }
